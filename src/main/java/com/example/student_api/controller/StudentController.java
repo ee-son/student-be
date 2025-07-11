@@ -1,7 +1,10 @@
 package com.example.student_api.controller;
 
 import com.example.student_api.model.Student;
-import com.example.student_api.repository.StudentRepository;
+import com.example.student_api.service.StudentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +13,56 @@ import java.util.List;
 @RequestMapping("/api/students")
 public class StudentController {
 
-    private final StudentRepository repo;
-
-    public StudentController(StudentRepository repo) {
-        this.repo = repo;
-    }
+    @Autowired
+    private StudentService studentService;
 
     @GetMapping
-    public List<Student> getAll() {
-        return repo.findAll();
+    public ResponseEntity<?> getAllStudents() {
+        List<Student> students = studentService.getAllStudents();
+        return ResponseEntity.ok(students);
     }
 
     @GetMapping("/{id}")
-    public Student getById(@PathVariable String id) {
-        return repo.findById(id).orElseThrow(() -> new RuntimeException("Student not found with id " + id));
+    public ResponseEntity<?> getStudentById(@PathVariable String id) {
+        Student student = studentService.getStudentById(id);
+        if (student != null) {
+            return ResponseEntity.ok(student);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ApiResponse(false, "Data tidak ditemukan")
+            );
+        }
     }
 
     @PostMapping
-    public Student create(@RequestBody Student student) {
-        return repo.save(student);
+    public ResponseEntity<?> createStudent(@RequestBody Student student) {
+        Student created = studentService.createStudent(student);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new ApiResponse(true, "Data berhasil ditambahkan", created)
+        );
     }
 
     @PutMapping("/{id}")
-    public Student update(@PathVariable String id, @RequestBody Student student) {
-        student.setId(id);
-        return repo.save(student);
+    public ResponseEntity<?> updateStudent(@PathVariable String id, @RequestBody Student updatedStudent) {
+        Student updated = studentService.updateStudent(id, updatedStudent);
+        if (updated != null) {
+            return ResponseEntity.ok(new ApiResponse(true, "Data berhasil diupdate", updated));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ApiResponse(false, "Data gagal diupdate. ID tidak ditemukan.")
+            );
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        repo.deleteById(id);
+    public ResponseEntity<?> deleteStudent(@PathVariable String id) {
+        boolean deleted = studentService.deleteStudent(id);
+        if (deleted) {
+            return ResponseEntity.ok(new ApiResponse(true, "Data berhasil dihapus"));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ApiResponse(false, "Data gagal dihapus. ID tidak ditemukan.")
+            );
+        }
     }
 }

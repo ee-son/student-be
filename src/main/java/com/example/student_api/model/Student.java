@@ -2,17 +2,20 @@ package com.example.student_api.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     private String namaDepan;
     private String namaBelakang;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate tanggalLahir;
 
+    // Getter & Setter
     public String getId() {
         return id;
     }
@@ -37,6 +40,4 @@ public class Student {
     public void setTanggalLahir(LocalDate tanggalLahir) {
         this.tanggalLahir = tanggalLahir;
     }
-
-    
 }
