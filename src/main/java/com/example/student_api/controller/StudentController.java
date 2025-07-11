@@ -21,19 +21,24 @@ public class StudentController {
         return repo.findAll();
     }
 
+    @GetMapping("/{id}")
+    public Student getById(@PathVariable String id) {
+        return repo.findById(id).orElseThrow(() -> new RuntimeException("Student not found with id " + id));
+    }
+
     @PostMapping
     public Student create(@RequestBody Student student) {
         return repo.save(student);
     }
 
     @PutMapping("/{id}")
-    public Student update(@PathVariable Long id, @RequestBody Student student) {
+    public Student update(@PathVariable String id, @RequestBody Student student) {
         student.setId(id);
         return repo.save(student);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         repo.deleteById(id);
     }
 }
