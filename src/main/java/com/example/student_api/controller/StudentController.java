@@ -7,23 +7,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+// Dependency for documentation
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/students")
+@Tag(name = "Student", description = "API untuk mengelola data mahasiswa")
 public class StudentController {
 
     @Autowired
     private StudentService studentService;
 
     @GetMapping
+    @Operation(
+        summary = "GET semua data mahasiswa", 
+        description = "Mengambil seluruh data mahasiswa dari database. Endpoint ini mengembalikan daftar lengkap mahasiswa dalam format JSON.")
     public ResponseEntity<?> getAllStudents() {
         List<Student> students = studentService.getAllStudents();
         return ResponseEntity.ok(students);
     }
 
     @GetMapping("/{id}")
+    @Operation(
+        summary = "GET satu data mahasiswa berdasarkan ID",
+        description = "Mengambil data mahasiswa berdasarkan ID yang diberikan. Jika ID tidak ditemukan, akan mengembalikan pesan error dengan status 404.")
     public ResponseEntity<?> getStudentById(@PathVariable String id) {
         Student student = studentService.getStudentById(id);
         if (student != null) {
@@ -36,6 +47,9 @@ public class StudentController {
     }
 
     @PostMapping
+    @Operation(
+        summary = "Tambah satu data mahasiswa",
+        description = "Menambahkan data mahasiswa baru melalui permintaan pengguna. Data baru akan disimpan dan dikembalikan sebagai konfirmasi berhasil.")
     public ResponseEntity<?> createStudent(@RequestBody Student student) {
         Student created = studentService.createStudent(student);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -44,6 +58,9 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update satu data mahasiswa berdasarkan ID",
+        description = "Memperbarui data mahasiswa berdasarkan ID yang diberikan. Jika ID tidak ditemukan, maka akan mengembalikan pesan gagal dengan status 404.")
     public ResponseEntity<?> updateStudent(@PathVariable String id, @RequestBody Student updatedStudent) {
         Student updated = studentService.updateStudent(id, updatedStudent);
         if (updated != null) {
@@ -56,6 +73,9 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+        summary = "Hapus satu data mahasiswa berdasarkan ID",
+        description = "Menghapus satu data mahasiswa berdasarkan ID yang dikirimkan. Berguna untuk menghapus data yang sudah tidak dibutuhkan.")
     public ResponseEntity<?> deleteStudent(@PathVariable String id) {
         boolean deleted = studentService.deleteStudent(id);
         if (deleted) {
